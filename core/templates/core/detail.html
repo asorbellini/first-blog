@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block post %}
+
+<article class="blog-post">
+    <strong class="d-inline-block mb-2 text-primary" ><a href="{% url 'category' post.category.id %}">{{ post.category }}</a></strong>
+    <h2 class="display-5 link-body-emphasis mb-1">{{ post.title }}</h2>
+    <p class="blog-post-meta">{{ post.updated }} por <a href="{% url 'author' post.author.id %}">{{ post.author.first_name }}</a></p>
+    <p class="lead-my-3">{{ post.excerpt }}</p>
+    <hr>
+    <div class="col-auto d-none d-lg-block">
+        {% if not post.image.url %}
+        {% else %}
+        <img class="bd-placeholder-img" width="100%" height="100%" src="{{ post.image.url }}">
+        {% endif %}
+    </div>
+    <hr>
+    <p>{{ post.image_description }}</p>
+    <hr>
+    <p>{{ post.content | safe }}</p>
+    <strong>Etiquetas:</strong>
+    {% for tag in post.tags.all %}  
+        <span class="badge text-bg-info">{{ tag.name | upper }}</span>
+    {% endfor %}
+    <br>
+    <br>
+    <form action="{% url 'like_post' post.pk %}" method="post">
+        {% csrf_token %}
+        {% if user.is_authenticated %}
+            {% if liked %}
+                <button type="submit" class="btn btn-sm btn-danger" name="post_id" value="{{ post.id }}">
+                    Ya no me gusta
+                </button>
+            {% else %}
+                <button type="submit" class="btn btn-sm btn-primary" name="post_id" value="{{ post.id }}">
+                    Me gusta <span class="badge text-bg-secondary">{{ total_likes }}</span>
+                </button>
+            {% endif %}
+        {% else %}
+        <small>Debe estar logueado para dar Me Gusta - Total de Me Gusta: <strong>{{ total_likes }}</strong></small>
+        {% endif %}
+    </form>
+</article>
+
+<div class="my-3">
+    <a class="btn btn-outline-success rounded-pill" href="{% url 'home' %}">Inicio</a>
+</div>
+
+{% endblock %}
